@@ -1,15 +1,21 @@
 #!/bin/sh
 
 # 确保当切换不同的代理时, 代理自己的 ip 一定加入白名单
-remote_server_ip=$(cat /opt/etc/shadowsocks.json |grep 'server"' |cut -d':' -f2|cut -d'"' -f2)
+remote_server_host=$(cat /opt/etc/shadowsocks.json |grep 'server"' |cut -d':' -f2|cut -d'"' -f2)
+remote_server_host_netflix=$(cat /opt/etc/shadowsocks.netflix.json |grep 'server"' |cut -d':' -f2|cut -d'"' -f2)
+remote_server_ip=$(nslookup $remote_server_host 8.8.8.8 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1)
+remote_server_ip_netflix=$(nslookup $remote_server_host_netflix 8.8.8.8 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1)
 ipset_protocal_version=$(ipset -v |grep -o 'version.*[0-9]' |head -n1 |cut -d' ' -f2)
 
 if [ "$ipset_protocal_version" == 6 ]; then
     ipset add CHINAIP $remote_server_ip
+    ipset add CHINAIP $remote_server_ip_netflix
 else
     ipset -q -A CHINAIP $remote_server_ip
+    ipset -q -A CHINAIP $remote_server_ip_netflix
 fi
 /opt/etc/init.d/S22shadowsocks restart
+/opt/etc/init.d/S23shadowsocks_netflix restart
 
 dnsmasq_dir=/opt/etc/dnsmasq.d
 

@@ -17,6 +17,7 @@ else
 fi
 
 local_redir_port=$(cat /opt/etc/shadowsocks.json |grep 'local_port' |cut -d':' -f2 |grep -o '[0-9]*')
+local_redir_port_netflix=$(cat /opt/etc/shadowsocks.netflix.json |grep 'local_port' |cut -d':' -f2 |grep -o '[0-9]*')
 
 # iptables 默认有四个表: raw, nat, mangle, filter, 每个表都有若干个不同的 chain.
 # 例如: filter 表包含 INPUT, FORWARD, OUTPUT 三个链, 下面创建了一个自定义 chain.
@@ -25,6 +26,7 @@ iptables -t nat -N SHADOWSOCKS_TCP 2>/dev/null
 # 两个 ipset 中的 ip 直接返回.
 iptables -t nat -A SHADOWSOCKS_TCP -p tcp -m set --match-set CHINAIPS dst -j RETURN
 iptables -t nat -A SHADOWSOCKS_TCP -p tcp -m set --match-set CHINAIP dst -j RETURN
+iptables -t nat -A SHADOWSOCKS_TCP -p tcp -m set --match-set NETFLIXIPS dst -j REDIRECT --to-ports $local_redir_port_netflix
 # 否则, 重定向到 ss-redir
 iptables -t nat -A SHADOWSOCKS_TCP -p tcp -j REDIRECT --to-ports $local_redir_port
 

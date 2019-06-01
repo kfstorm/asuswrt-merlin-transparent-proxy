@@ -1,6 +1,7 @@
-/router/opt/etc/shadowsocks.json
+/router/opt/etc/shadowsocks.*
 /router/opt/etc/user_domain_name_whitelist.txt
 /router/opt/etc/user_domain_name_blocklist.txt
 /router/opt/etc/user_domain_name_gfwlist.txt
 /router/opt/etc/user_ip_whitelist.txt
 /router/opt/etc/dnscrypt-proxy.sh
+/router/opt/etc/getflix.txt

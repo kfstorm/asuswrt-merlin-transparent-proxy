@@ -13,6 +13,16 @@ if [ ! -e ./router/opt/etc/shadowsocks.json ];then
     exit
 fi
 
+if [ ! -e ./router/opt/etc/shadowsocks.netflix.json ];then
+    echo '请首先定义 router/opt/etc/shadowsocks.netflix.json'
+    exit
+fi
+
+if [ ! -e ./router/opt/etc/getflix.txt ];then
+    echo '请首先运行 netflix_ip_generator.sh'
+    exit
+fi
+
 copy router/opt/etc/dnscrypt-proxy.toml /opt/etc
 copy router/opt/etc/dnsmasq.d/foreign_domains.conf /opt/etc/dnsmasq.d/foreign_domains.conf
 copy router/opt/etc/apply_ipset_rule.sh /opt/etc
@@ -26,7 +36,10 @@ copy router/opt/etc/localips /opt/etc
 copy router/opt/etc/update_ip_whitelist /opt/etc
 copy router/opt/etc/update_dns_whitelist /opt/etc
 
-copy router/opt/etc/shadowsocks.* /opt/etc
+copy router/opt/etc/shadowsocks.json /opt/etc
+copy router/opt/etc/shadowsocks.netflix.json /opt/etc
+copy router/opt/etc/getflix.txt /opt/etc
+
 [ -e router/opt/etc/user_ip_whitelist.txt ] && copy router/opt/etc/user_ip_whitelist.txt /opt/etc
 [ -e router/opt/etc/user_domain_name_whitelist.txt ] && copy router/opt/etc/user_domain_name_whitelist.txt /opt/etc
 [ -e router/opt/etc/user_domain_name_blocklist.txt ] && copy router/opt/etc/user_domain_name_blocklist.txt /opt/etc
@@ -102,6 +115,11 @@ replace_regex 'server=/#/.*' 'server=/#/127.0.0.1#65053' /opt/etc/dnsmasq.d/fore
 replace_string ss-local ss-redir /opt/etc/init.d/S22shadowsocks
 # 开启 v2ray
 sed -i "s#^ARGS=.*#ARGS=\"-c /opt/etc/shadowsocks.json --plugin /opt/etc/v2ray-plugin_linux_arm5\"#" /opt/etc/init.d/S22shadowsocks
+
+cp /opt/etc/init.d/S22shadowsocks /opt/etc/init.d/S23shadowsocks_netflix
+replace_string /opt/etc/shadowsocks.json /opt/etc/shadowsocks.netflix.json /opt/etc/init.d/S23shadowsocks_netflix
+replace_string ss-redir ss-redir-2 /opt/etc/init.d/S23shadowsocks_netflix
+cp /opt/bin/ss-redir /opt/bin/ss-redir-2
 
 # ----------------------------------------------------
 #
