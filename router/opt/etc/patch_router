@@ -1,21 +1,6 @@
 #!/bin/sh
 
-# 确保当切换不同的代理时, 代理自己的 ip 一定加入白名单
-remote_server_host=$(cat /opt/etc/shadowsocks.json |grep 'server"' |cut -d':' -f2|cut -d'"' -f2)
-remote_server_host_netflix=$(cat /opt/etc/shadowsocks.netflix.json |grep 'server"' |cut -d':' -f2|cut -d'"' -f2)
-remote_server_ip=$(nslookup $remote_server_host 8.8.8.8 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1)
-remote_server_ip_netflix=$(nslookup $remote_server_host_netflix 8.8.8.8 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1)
-ipset_protocal_version=$(ipset -v |grep -o 'version.*[0-9]' |head -n1 |cut -d' ' -f2)
-
-if [ "$ipset_protocal_version" == 6 ]; then
-    ipset add CHINAIP $remote_server_ip
-    ipset add CHINAIP $remote_server_ip_netflix
-else
-    ipset -q -A CHINAIP $remote_server_ip
-    ipset -q -A CHINAIP $remote_server_ip_netflix
-fi
-/opt/etc/init.d/S22shadowsocks restart
-/opt/etc/init.d/S23shadowsocks_netflix restart
+/opt/etc/init.d/S22v2ray restart
 
 dnsmasq_dir=/opt/etc/dnsmasq.d
 
@@ -45,10 +30,6 @@ if [ -d "$dnsmasq_dir" ]; then
 
     if ! [ -s $dnsmasq_dir/$accelerated.bak ]; then
         /opt/etc/update_dns_whitelist
-    fi
-
-    if ! [ -s /opt/etc/chinadns_chnroute.txt ]; then
-        /opt/etc/update_ip_whitelist
     fi
 
     default_dns_ip=127.0.0.1
@@ -84,17 +65,9 @@ if [ -d "$dnsmasq_dir" ]; then
     chmod +x /opt/etc/restart_dnsmasq && /opt/etc/restart_dnsmasq
 fi
 
-/opt/etc/apply_ipset_rule.sh
 /opt/etc/toggle_proxy.sh enable
 
-if [ -e /opt/etc/dnscrypt-proxy.sh -a -e /opt/etc/init.d/S09dnscrypt-proxy ]; then
-    source /opt/etc/dnscrypt-proxy.sh
-
-    [ "$tcp_only" == true ] && tcp_only_arg='-T'
-
-    sed -i "s#^ARGS=.*#ARGS=\"${tcp_only_arg} -a 127.0.0.1:65053 -r ${resolver_address_with_port} -N ${provider_name} -k ${provider_key} -l /var/log/dnscrypt-proxy.log\"#" /opt/etc/init.d/S09dnscrypt-proxy
-    /opt/etc/init.d/S09dnscrypt-proxy restart
-elif [ -e /opt/etc/dnscrypt-proxy.toml -a -e /opt/etc/init.d/S09dnscrypt-proxy2 ]; then
+if [ -e /opt/etc/dnscrypt-proxy.toml -a -e /opt/etc/init.d/S09dnscrypt-proxy2 ]; then
     echo 'Use dnscrypt-proxy2 red fish source.'
     echo 'Checking config file.'
     set -e
