@@ -49,7 +49,7 @@ if ipset -L CHINAIP; then
     ipset_add_chinaip 81.4.123.217 # entware
     ipset_add_chinaip 151.101.76.133 # raw.githubusercontent.com
     ipset_add_chinaip 151.101.40.133 # raw.githubusercontent.com
-    for remote_server_ip in $(grep '"address"' /opt/etc/v2ray/config.json | grep -oP '[^"]*(?="\s*(,|$))'); do
+    for remote_server_ip in $(grep '"address"' /opt/etc/v2ray/config.json | grep -o ':\s*"[^"]*"' | cut -d'"' -f2); do
         ipset_add_chinaip $remote_server_ip # vps ip address, 如果访问 VPS 地址, 无需跳转, 直接返回, 否则会形成死循环.
     done
 
