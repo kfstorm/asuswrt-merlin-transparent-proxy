@@ -10,6 +10,8 @@ fi
 
 iptables -t nat -N V2RAY 2>/dev/null
 
+iptables -t nat -A V2RAY -p tcp -m set --match-set CHINAIPS dst -j RETURN
+iptables -t nat -A V2RAY -p tcp -m set --match-set CHINAIP dst -j RETURN
 iptables -t nat -A V2RAY -p tcp -j REDIRECT --to-ports 1080
 
 iptables -t nat -A PREROUTING -p tcp -j V2RAY

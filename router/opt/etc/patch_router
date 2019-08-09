@@ -65,6 +65,7 @@ if [ -d "$dnsmasq_dir" ]; then
     chmod +x /opt/etc/restart_dnsmasq && /opt/etc/restart_dnsmasq
 fi
 
+/opt/etc/apply_ipset_rule.sh
 /opt/etc/toggle_proxy.sh enable
 
 if [ -e /opt/etc/dnscrypt-proxy.toml -a -e /opt/etc/init.d/S09dnscrypt-proxy2 ]; then
