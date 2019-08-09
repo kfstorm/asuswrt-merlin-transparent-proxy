@@ -28,15 +28,11 @@ if [ -d "$dnsmasq_dir" ]; then
     user_domain_name_blocklist=/opt/etc/user_domain_name_blocklist.txt
     user_domain_name_gfwlist=/opt/etc/user_domain_name_gfwlist.txt
 
-    if ! [ -s $dnsmasq_dir/$accelerated.bak ]; then
+    if ! [ -s $dnsmasq_dir/$accelerated ]; then
         /opt/etc/update_dns_whitelist
     fi
 
     default_dns_ip=127.0.0.1
-
-    sed "s#114\.114\.114\.114#${default_dns_ip}#" $dnsmasq_dir/$accelerated.bak > $dnsmasq_dir/$accelerated
-    sed "s#114\.114\.114\.114#${default_dns_ip}#" $dnsmasq_dir/$google.bak > $dnsmasq_dir/$google
-    sed "s#114\.114\.114\.114#${default_dns_ip}#" $dnsmasq_dir/$apple.bak > $dnsmasq_dir/$apple
 
     OLDIFS="$IFS" && IFS=$'\n'
     if [ -f $user_domain_name_whitelist ]; then
