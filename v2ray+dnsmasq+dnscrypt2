@@ -21,6 +21,7 @@ copy router/opt/etc/toggle_proxy.sh /opt/etc
 copy router/opt/etc/patch_router /opt/etc
 copy router/opt/etc/restart_dnsmasq /opt/etc
 copy router/opt/etc/localips /opt/etc
+copy router/opt/etc/update_ip_whitelist /opt/etc
 copy router/opt/etc/update_dns_whitelist /opt/etc
 copy router/opt/etc/enable_swap.sh /opt/etc
 
@@ -111,6 +112,7 @@ chmod +x apply_ipset_rule.sh \
       patch_router \
       restart_dnsmasq \
       toggle_proxy.sh \
+      update_ip_whitelist \
       update_dns_whitelist \
       enable_swap.sh \
       /jffs/scripts/services-start \

@@ -32,6 +32,10 @@ if [ -d "$dnsmasq_dir" ]; then
         /opt/etc/update_dns_whitelist
     fi
 
+    if ! [ -s /opt/etc/chinadns_chnroute.txt ]; then
+        /opt/etc/update_ip_whitelist
+    fi
+
     default_dns_ip=127.0.0.1
 
     OLDIFS="$IFS" && IFS=$'\n'
